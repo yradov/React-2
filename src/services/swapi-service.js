@@ -16,32 +16,68 @@ export default class SwapServise {
     }//gerResource
 
     async getAllPeople() {
-        const res = await this.gerResource(this._peopleUrl);
-        return res.results;
+        const res = await this.getResource(`/people/`);
+        return res.results.map(this._transformPerson);
     }//getAllPeople
 
-    getPerson(id) {
-        return this.gerResource(this._peopleUrl + id);
-    }//getAllPeople
+    async getPerson(id) {
+        const person = await this.getResource(`/people/${id}/`);
+        return this._transformPerson(person);
+    }//getPerson
 
-    async getAllPlanets() {
-        const res = await this.gerResource(this._planetsUrl);
-        return res.results;
-    }//getAllPlanets
-
-    getPlanet(id) {
-        return this.gerResource(this._planetsUrl + id);
+    async getPlanet(id) {
+        const planet = await this.gerResource(this._planetsUrl + id);
+        return this._transformPlanet(planet);
     }//getPlanet
 
     async getAllStarships() {
-        const res = await this.gerResource(this._starshipsUrl);
-        return res.results;
+        const res = await this.getResource(`/starships/`);
+        return res.results.map(this._transformStarship);
     }//getAllStarships
 
-    getStarship(id) {
-        return this.gerResource(this._starshipsUrl + id);
+    async getStarship(id) {
+        const starship = this.getResource(`/starships/${id}/`);
+        return this._transformStarship(starship);
     }//getStarship
 
+    _extractIdFromUrl(item) {
+        const idRegExp = /\/([0-9]+)\/$/;
+        return item.url.match(idRegExp)[1];
+    }//_extractIdFromUrl
+
+    _transformPlanet(planet) {
+        return {
+            id: this._extractIdFromUrl(planet),
+            name: planet.name,
+            population: planet.population,
+            rotationPeriod: planet.rotation_period,
+            diameter: planet.diameter,
+        }
+    }//_transformPlanet
+
+    _transformStarship(starship) {
+        return {
+            id: this._extractId(starship),
+            name: starship.name,
+            model: starship.model,
+            manufacturer: starship.manufacturer,
+            costInCredits: starship.costInCredits,
+            length: starship.length,
+            crew: starship.crew,
+            passengers: starship.passengers,
+            cargoCapacity: starship.cargoCapacity
+        }
+    }//_transformStarship
+
+    _transformPerson(person) {
+        return {
+            id: this._extractId(person),
+            name: person.name,
+            gender: person.gender,
+            birthYear: person.birthYear,
+            eyeColor: person.eyeColor
+        }
+    }//_transformPerson
 }//SwapServise
 
 // const swapi = new SwapServise();
